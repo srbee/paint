@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#182b55">
+<title>Painterly Strokes</title>
+<style>
+:root{--ink:#182b55;--paper:#fffdf7}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#eaf7ff;color:var(--ink);overscroll-behavior:none}
+body{height:100dvh}
+.app{height:100%;height:100dvh;max-width:900px;margin:auto;display:flex;flex-direction:column;padding:clamp(5px,1.4vh,12px);gap:clamp(4px,1vh,9px)}
+header{flex:0 0 auto;min-height:48px;border-radius:16px;padding:6px 11px;background:linear-gradient(110deg,#ffe27a,#fff7e3 48%,#bdeaff);box-shadow:0 3px 0 #c1d7e9;display:flex;align-items:center;gap:9px}
+.logo{font-size:clamp(24px,5vh,40px);line-height:1}
+h1{font-size:clamp(18px,4.2vw,30px);line-height:1.05;margin:0;font-weight:900;letter-spacing:-.6px}
+.sub{font-size:clamp(9px,2.5vw,12px);margin-top:3px;font-weight:650;color:#405276}
+.styles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;flex:0 0 auto}
+.style{min-width:0;border:2px solid transparent;border-radius:11px;padding:4px 1px;background:var(--tile,#fff);color:#182b55;box-shadow:0 2px 0 #c7d9e6;display:flex;align-items:center;justify-content:center;gap:2px;flex-direction:column;font-size:clamp(9px,2.5vw,12px);font-weight:800;line-height:1.05;min-height:42px;touch-action:manipulation}
+.style .emoji{font-size:clamp(16px,4vw,24px);line-height:1}
+.style.active{border-color:#1768dd;box-shadow:inset 0 0 0 1px #1768dd,0 2px 0 #b8cbe1}
+#status{font-size:10px;font-weight:700;color:#4c5f7b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.canvas-wrap{flex:1 1 auto;min-height:0;position:relative;background:var(--paper);border:2px solid #b5d5e8;border-radius:18px;overflow:hidden;box-shadow:0 3px 0 #c7e0ee;touch-action:none}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.canvas-hint{position:absolute;left:9px;top:7px;font-size:10px;font-weight:700;color:#9aa9b8;pointer-events:none;background:#fffdf7d9;border-radius:8px;padding:3px 6px}
+.controls{flex:0 0 auto;border-radius:16px;padding:6px;background:linear-gradient(110deg,#d3f2ff,#fff);display:flex;align-items:center;gap:7px;box-shadow:0 2px 0 #c6e2ef;min-height:53px}
+.clear{border:0;border-radius:12px;background:#ff514c;color:white;font-size:clamp(13px,3.5vw,17px);font-weight:900;padding:9px 10px;box-shadow:0 3px 0 #d63837;white-space:nowrap;touch-action:manipulation}
+.brush{flex:1;min-width:50px;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:10px;font-weight:800}
+input[type=range]{width:100%;max-width:150px;accent-color:#1674e8;margin:0}
+.palette{display:flex;gap:5px;align-items:center;justify-content:space-around;flex:1.15;min-width:0}
+.swatch{width:clamp(18px,5.3vw,29px);height:clamp(18px,5.3vw,29px);border-radius:50%;border:2px solid white;box-shadow:0 0 0 1px #aab8c5;flex-shrink:0;padding:0}
+.swatch.active{box-shadow:0 0 0 3px #1674e8}
+@media(max-height:600px){.app{gap:4px;padding:5px}.styles{gap:3px}.style{min-height:34px;padding:2px 1px}.style .emoji{font-size:15px}.controls{min-height:46px;padding:4px}.clear{padding:6px 8px}}
+@media(min-width:600px){.app{padding:12px;gap:9px}.styles{gap:7px}.style{min-height:55px}.controls{min-height:65px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><div class="logo">🎨</div><div><h1>Painterly Strokes</h1><div class="sub">Draw • Choose a painter • See the magic!</div></div></header>
+<section class="styles" aria-label="Choose a drawing style">
+<button class="style active" data-style="simple" style="--tile:#ffe77b"><span class="emoji">〰️</span><span>Simple</span></button>
+<button class="style" data-style="vangogh" style="--tile:#c8eaff"><span class="emoji">🌌</span><span>Van Gogh</span></button>
+<button class="style" data-style="rembrandt" style="--tile:#f7d5a7"><span class="emoji">🕯️</span><span>Rembrandt</span></button>
+<button class="style" data-style="hussain" style="--tile:#ffd1d1"><span class="emoji">🐎</span><span>M. F. Husain</span></button>
+<button class="style" data-style="monet" style="--tile:#c8f0dc"><span class="emoji">🌷</span><span>Monet</span></button>
+<button class="style" data-style="picasso" style="--tile:#ffd6b1"><span class="emoji">🔶</span><span>Picasso</span></button>
+<button class="style" data-style="davinci" style="--tile:#f8e5a2"><span class="emoji">✍️</span><span>Da Vinci</span></button>
+<button class="style" data-style="watercolor" style="--tile:#d8f7fb"><span class="emoji">💧</span><span>Watercolour</span></button>
+<button class="style" data-style="charcoal" style="--tile:#e4e7eb"><span class="emoji">✏️</span><span>Charcoal</span></button>
+<button class="style" data-style="ink" style="--tile:#fff0cf"><span class="emoji">🖌️</span><span>Ink</span></button>
+</section>
+<div id="status">Selected: Simple strokes</div>
+<section class="canvas-wrap" id="canvasWrap" aria-label="Drawing canvas"><canvas id="canvas"></canvas><div class="canvas-hint" id="hint">Draw here with your finger</div></section>
+<footer class="controls">
+<button class="clear" id="clear">🗑 Clear</button>
+<div class="brush"><label for="size">BRUSH SIZE</label><input id="size" type="range" min="2" max="20" value="6" aria-label="Brush size"></div>
+<div class="palette" aria-label="Choose colour">
+<button class="swatch active" data-color="#101820" style="background:#101820" aria-label="Black"></button><button class="swatch" data-color="#f23830" style="background:#f23830" aria-label="Red"></button><button class="swatch" data-color="#ffc928" style="background:#ffc928" aria-label="Yellow"></button><button class="swatch" data-color="#1769e8" style="background:#1769e8" aria-label="Blue"></button><button class="swatch" data-color="#16864a" style="background:#16864a" aria-label="Green"></button><button class="swatch" data-color="#a72bd6" style="background:#a72bd6" aria-label="Purple"></button>
+</div></footer></main>
+<script>
+(()=> {
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),wrap=document.getElementById('canvasWrap'),status=document.getElementById('status'),hint=document.getElementById('hint');
+let style='simple',color='#101820',size=6,drawing=false,current=null,strokes=[],dpr=1;
+const names={simple:'Simple strokes',vangogh:'Van Gogh-inspired swirls',rembrandt:'Rembrandt-inspired chiaroscuro',hussain:'M. F. Husain-inspired bold forms',monet:'Monet-inspired dabs',picasso:'Picasso-inspired geometry',davinci:'Da Vinci-inspired sketch',watercolor:'Watercolour wash',charcoal:'Charcoal sketch',ink:'Expressive ink'};
+function resize(){const r=wrap.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);const old=document.createElement('canvas');old.width=canvas.width;old.height=canvas.height;if(old.width&&old.height)old.getContext('2d').drawImage(canvas,0,0);canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);if(old.width&&old.height)ctx.drawImage(old,0,0,old.width,old.height,0,0,r.width,r.height)}
+function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function rand(n){const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+function rgb(h){h=h.slice(1);return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function rgba(h,a){const [r,g,b]=rgb(h);return `rgba(${r},${g},${b},${a})`}
+function mix(a,b,t){let x=rgb(a),y=rgb(b);return '#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+function line(p,c,w,a=1,off=0){if(p.length<2)return;ctx.save();ctx.globalAlpha=a;ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();p.forEach((v,i)=>{let x=v.x+(off?Math.sin(i*.7)*off:0),y=v.y+(off?Math.cos(i*.6)*off:0);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.restore()}
+function draw(s){let p=s.points,b=s.size;if(!p.length)return;if(p.length===1){ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(p[0].x,p[0].y,b/2,0,7);ctx.fill();return}
+if(s.style==='simple'){line(p,s.color,b);return}
+if(s.style==='vangogh'){let cs=[s.color,'#ffd33d','#1678e8','#124b9b','#73d8ee'];for(let j=0;j<5;j++)line(p,j?cs[(j+Math.floor(rand(s.seed+j)*4))%cs.length]:s.color,b*(.95-j*.14),j?.62:1,(j-2)*b*.42);for(let i=1;i<p.length;i+=2){let v=p[i],q=p[i-1],a=Math.atan2(v.y-q.y,v.x-q.x),l=b*(1.3+rand(s.seed+i)*2);ctx.strokeStyle=cs[i%cs.length];ctx.lineWidth=Math.max(1,b*.22);ctx.beginPath();ctx.moveTo(v.x-Math.cos(a)*l,v.y-Math.sin(a)*l);ctx.quadraticCurveTo(v.x+Math.sin(a)*l*.6,v.y-Math.cos(a)*l*.6,v.x+Math.cos(a)*l,v.y+Math.sin(a)*l);ctx.stroke()}}
+else if(s.style==='rembrandt'){line(p,'#26160e',b*2.3,.16,b*.2);line(p,mix(s.color,'#3a2114',.58),b*1.45,.8);line(p,mix(s.color,'#f6c77c',.45),b*.55,.82,-b*.25)}
+else if(s.style==='hussain'){line(p,'#101820',b*1.8,.96);for(let i=1;i<p.length;i+=3){let a=p[i-1],v=p[i],dx=v.x-a.x,dy=v.y-a.y,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;ctx.fillStyle=[s.color,'#ff3c28','#ffc928','#1769e8','#101820'][i%5];ctx.beginPath();ctx.moveTo(a.x+nx*b,a.y+ny*b);ctx.lineTo(v.x+nx*b*1.8,v.y+ny*b*1.8);ctx.lineTo(v.x-nx*b*1.8,v.y-ny*b*1.8);ctx.lineTo(a.x-nx*b,a.y-ny*b);ctx.closePath();ctx.fill()}}
+else if(s.style==='monet'){line(p,s.color,b*1.8,.12);for(let i=0;i<p.length;i+=2){let v=p[i];for(let j=0;j<3;j++){ctx.save();ctx.translate(v.x+(rand(s.seed+i+j)*b*2-b),v.y+(rand(s.seed+i*j+8)*b*1.6-b*.8));ctx.rotate((rand(s.seed+i+j+2)-.5)*1.3);ctx.fillStyle=mix(s.color,['#bce9db','#ffe48a','#a5c8ee','#f3a6b8'][j],.4);ctx.globalAlpha=.68;ctx.beginPath();ctx.ellipse(0,0,b*(.35+rand(i+j)*.55),b*.18,0,0,7);ctx.fill();ctx.restore()}}line(p,s.color,b*.42,.65)}
+else if(s.style==='picasso'){for(let i=1;i<p.length;i++){let a=p[i-1],v=p[i];ctx.strokeStyle=[s.color,'#f23830','#ffc928','#1769e8','#111820'][i%5];ctx.lineWidth=b*(.7+rand(i+s.seed));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo((a.x+v.x)/2+(rand(i)*b*2-b),(a.y+v.y)/2+(rand(i+2)*b*2-b));ctx.lineTo(v.x,v.y);ctx.stroke()}line(p,'#111820',Math.max(1,b*.2))}
+else if(s.style==='davinci'){line(p,mix(s.color,'#b2a18a',.5),b*.72,.9);for(let j=0;j<3;j++)line(p,s.color,Math.max(.5,b*.12),.45,(j-1)*b*.7);for(let i=2;i<p.length;i+=4){let v=p[i];ctx.strokeStyle=rgba(s.color,.3);ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(v.x-b,v.y+b);ctx.lineTo(v.x+b,v.y-b);ctx.stroke()}}
+else if(s.style==='watercolor'){for(let j=0;j<4;j++)line(p,s.color,b*(2.5-j*.35),.12+j*.035,(j-1)*b*.25);line(p,mix(s.color,'#ffffff',.22),b*.6,.34)}
+else if(s.style==='charcoal'){line(p,'#222222',b*1.35,.22,b*.6);line(p,s.color,b*.72,.9);for(let i=0;i<p.length;i+=2){let v=p[i];ctx.fillStyle=rgba(s.color,.3);ctx.fillRect(v.x-b*.5,v.y-b*.4,b*.7,b*.5)}}
+else if(s.style==='ink'){for(let i=1;i<p.length;i++){let a=p[i-1],v=p[i],t=i/p.length;ctx.strokeStyle=s.color;ctx.lineWidth=Math.max(.7,b*(.3+Math.sin(t*Math.PI)*1.4));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo((a.x+v.x)/2+Math.sin(i)*b*.5,(a.y+v.y)/2+Math.cos(i)*b*.5,v.x,v.y);ctx.stroke()}for(let i=3;i<p.length;i+=5){let v=p[i];ctx.strokeStyle=s.color;ctx.lineWidth=Math.max(.6,b*.16);ctx.beginPath();ctx.moveTo(v.x,v.y);ctx.lineTo(v.x+b*(rand(i)-.5)*2,v.y+b*(1+rand(i+3)*2));ctx.stroke()}}
+}
+function redraw(){let r=canvas.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle='#fffdf7';ctx.fillRect(0,0,r.width,r.height);strokes.forEach(draw);if(current)draw(current)}
+function start(e){e.preventDefault();drawing=true;canvas.setPointerCapture?.(e.pointerId);current={style,color,size,seed:Math.random()*10000,points:[point(e)]};hint.style.display='none';redraw()}
+function move(e){if(!drawing||!current)return;e.preventDefault();let p=point(e),last=current.points.at(-1);if(Math.hypot(p.x-last.x,p.y-last.y)>1){current.points.push(p);redraw()}}
+function end(){if(!drawing)return;drawing=false;if(current){strokes.push(current);current=null;redraw()}}
+canvas.addEventListener('pointerdown',start);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
+document.querySelectorAll('.style').forEach(b=>b.addEventListener('click',()=>{style=b.dataset.style;document.querySelectorAll('.style').forEach(x=>x.classList.toggle('active',x===b));status.textContent='Selected: '+names[style];hint.textContent=style==='simple'?'Draw here with your finger':'Draw here — your strokes use this style'}));
+document.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click',()=>{color=b.dataset.color;document.querySelectorAll('.swatch').forEach(x=>x.classList.toggle('active',x===b))}));
+document.getElementById('size').addEventListener('input',e=>size=+e.target.value);
+document.getElementById('clear').addEventListener('click',()=>{strokes=[];current=null;drawing=false;redraw();hint.style.display='block'});
+new ResizeObserver(()=>{resize();redraw()}).observe(wrap);resize();redraw();
+})();
+</script>
+</body>
+</html>
